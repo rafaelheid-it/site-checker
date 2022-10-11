@@ -1,0 +1,27 @@
+{
+  "name": "heidtech/site-checker",
+  "description": "Check your site for inaccessible pages and broken links.",
+  "minimum-stability": "stable",
+  "type": "typo3-cms-extension",
+  "license": "GPL-2.0-only",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "Rafael Heid",
+      "email": "rafael.heid@heid.tech"
+    }
+  ],
+  "require": {
+    "typo3/cms-core": "^11.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Heidtech\\SiteChecker\\": "Classes/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "site_checker"
+    }
+  }
+}
