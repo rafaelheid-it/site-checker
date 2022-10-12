@@ -12,7 +12,9 @@
     }
   ],
   "require": {
-    "typo3/cms-core": "^11.5"
+    "typo3/cms-core": "^11.5",
+    "ext-dom": "*",
+    "typo3/cms-scheduler": "^11.5"
   },
   "autoload": {
     "psr-4": {
