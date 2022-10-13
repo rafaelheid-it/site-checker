@@ -31,12 +31,6 @@ class SiteProcessor
         $this->startPage = new Uri($siteStartUrl);
         $this->linkQueue['internal'][] = $siteStartUrl;
 
-        /**
-         * @todo Check Link for scheme and host.
-         * "(/)some/page/slug" -> "{scheme}://{host}/some/page/slug"
-         *
-         */
-
         while(!empty($this->linkQueue['internal'])) {
             $pageUrl = array_shift($this->linkQueue['internal']);
             $pageInfo = $this->pageProcessor->processInternalPage($pageUrl);
