@@ -10,7 +10,7 @@ use Heidtech\SiteChecker\Logging\PageInfo;
 
 class PageProcessor
 {
-    public function processPage(string $page): ?PageInfo
+    public function processInternalPage(string $page): ?PageInfo
     {
         $client = new Client();
 
@@ -39,7 +39,27 @@ class PageProcessor
         return $pageInfo;
     }
 
-    public function findLinksInPage(\DOMDocument $page): array
+    public function processExternalPage(string $page): ?PageInfo
+    {
+        $client = new Client();
+
+        try {
+            $response = $client->request('GET', $page);
+        } catch (GuzzleException $exception) {
+            return null;
+        }
+
+        $statusCode = $response->getStatusCode();
+
+        $pageInfo = new PageInfo();
+        $pageInfo->setUrl($page);
+        $pageInfo->setStatusCode($statusCode);
+        $pageInfo->setErrorMessage($response->getReasonPhrase());
+
+        return $pageInfo;
+    }
+
+    protected function findLinksInPage(\DOMDocument $page): array
     {
         $linkUrls = [];
         $linkElements = $page->getElementsByTagName('a');
@@ -51,4 +71,6 @@ class PageProcessor
 
         return $linkUrls;
     }
+
+
 }
