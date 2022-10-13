@@ -10,14 +10,20 @@ use Heidtech\SiteChecker\Logging\PageInfo;
 
 class PageProcessor
 {
-    public function processInternalPage(string $page): ?PageInfo
+    public function processInternalPage(string $page): PageInfo
     {
         $client = new Client();
 
         try {
             $response = $client->request('GET', $page);
         } catch (GuzzleException $exception) {
-            return null;
+            // @todo refactor (same code as in processExternalPage)
+            $statusCode = $exception->getCode();
+            $pageInfo = new PageInfo();
+            $pageInfo->setUrl($page);
+            $pageInfo->setStatusCode($statusCode);
+            $pageInfo->setErrorMessage($exception->getMessage());
+            return $pageInfo;
         }
 
         $statusCode = $response->getStatusCode();
@@ -46,7 +52,12 @@ class PageProcessor
         try {
             $response = $client->request('GET', $page);
         } catch (GuzzleException $exception) {
-            return null;
+            $statusCode = $exception->getCode();
+            $pageInfo = new PageInfo();
+            $pageInfo->setUrl($page);
+            $pageInfo->setStatusCode($statusCode);
+            $pageInfo->setErrorMessage($exception->getMessage());
+            return $pageInfo;
         }
 
         $statusCode = $response->getStatusCode();

@@ -49,12 +49,14 @@ class SiteProcessor
 
     protected function processExternalLinksForPage(string $page)
     {
-        $externalLinksForPage = $this->linkQueue['external'][$page];
-        foreach ($externalLinksForPage as $externalLink) {
-            $pageInfo = $this->pageProcessor->processExternalPage($externalLink);
-            Logger::logPageInfo($pageInfo);
+        if (isset($this->linkQueue['external'][$page])) {
+            $externalLinksForPage = $this->linkQueue['external'][$page];
+            foreach ($externalLinksForPage as $externalLink) {
+                $pageInfo = $this->pageProcessor->processExternalPage($externalLink);
+                Logger::logPageInfo($pageInfo);
+            }
+            unset($this->linkQueue['external'][$page]);
         }
-        unset($this->linkQueue['external'][$page]);
     }
 
     protected function addLinkToQueue(string $link, string $parentPage)
