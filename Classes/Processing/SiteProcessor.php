@@ -57,6 +57,7 @@ class SiteProcessor
             foreach ($externalLinksForPage as $externalLink) {
                 $pageInfo = $this->pageProcessor->processExternalPage($externalLink);
                 Logger::logPageInfoToJson($pageInfo);
+                $this->processedPages[] = $pageInfo->getUrl();
             }
             unset($this->linkQueue['external'][$page]);
         }
@@ -64,16 +65,20 @@ class SiteProcessor
 
     protected function addLinkToQueue(string $link, string $parentPage)
     {
-        if (LinkUtility::isLinkInternal($link, $this->startPage->getHost())) {
-            $prefixedInternalLink = LinkUtility::prefixLinkWithSchemeAndHost(
-                $link,
-                $this->startPage->getScheme(),
-                $this->startPage->getHost()
-            );
+        $prefixedLink = LinkUtility::prefixLinkWithSchemeAndHost(
+            $link,
+            $this->startPage->getScheme(),
+            $this->startPage->getHost()
+        );
 
-            $this->addInternalLinkToQueue($prefixedInternalLink);
+        if (in_array($prefixedLink, $this->processedPages)) {
+            return;
+        }
+
+        if (LinkUtility::isLinkInternal($prefixedLink, $this->startPage->getHost())) {
+            $this->addInternalLinkToQueue($prefixedLink);
         } else {
-            $this->addExternalLinkToQueue($link, $parentPage);
+            $this->addExternalLinkToQueue($prefixedLink, $parentPage);
         }
     }
 
