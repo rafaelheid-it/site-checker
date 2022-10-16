@@ -10,9 +10,14 @@ class PageInfo
 
     protected int $statusCode;
 
-    protected string $errorMessage;
+    protected string $statusMessage;
 
     protected array $linksInPage = [];
+
+    public function getVars(): array
+    {
+        return get_object_vars($this);
+    }
 
 
     /**
@@ -50,17 +55,17 @@ class PageInfo
     /**
      * @return string
      */
-    public function getErrorMessage(): string
+    public function getStatusMessage(): string
     {
-        return $this->errorMessage;
+        return $this->statusMessage;
     }
 
     /**
-     * @param string $errorMessage
+     * @param string $statusMessage
      */
-    public function setErrorMessage(string $errorMessage): void
+    public function setStatusMessage(string $statusMessage): void
     {
-        $this->errorMessage = $errorMessage;
+        $this->statusMessage = $statusMessage;
     }
 
     /**

@@ -69,7 +69,7 @@ class PageProcessor
         $pageInfo = new PageInfo();
         $pageInfo->setUrl($page);
         $pageInfo->setStatusCode($statusCode);
-        $pageInfo->setErrorMessage($exception->getMessage());
+        $pageInfo->setStatusMessage($exception->getMessage());
 
         return $pageInfo;
     }
@@ -81,7 +81,7 @@ class PageProcessor
         $pageInfo = new PageInfo();
         $pageInfo->setUrl($page);
         $pageInfo->setStatusCode($statusCode);
-        $pageInfo->setErrorMessage($response->getReasonPhrase());
+        $pageInfo->setStatusMessage($response->getReasonPhrase());
 
         return $pageInfo;
     }

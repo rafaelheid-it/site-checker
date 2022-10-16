@@ -34,7 +34,7 @@ class SiteProcessor
         while(!empty($this->linkQueue['internal'])) {
             $pageUrl = array_shift($this->linkQueue['internal']);
             $pageInfo = $this->pageProcessor->processInternalPage($pageUrl);
-            Logger::logPageInfo($pageInfo);
+            Logger::logPageInfoToJson($pageInfo);
 
             foreach ($pageInfo->getLinksInPage() as $link) {
                 if (!in_array($link, $this->processedPages)) {
@@ -53,7 +53,7 @@ class SiteProcessor
             $externalLinksForPage = $this->linkQueue['external'][$page];
             foreach ($externalLinksForPage as $externalLink) {
                 $pageInfo = $this->pageProcessor->processExternalPage($externalLink);
-                Logger::logPageInfo($pageInfo);
+                Logger::logPageInfoToJson($pageInfo);
             }
             unset($this->linkQueue['external'][$page]);
         }
