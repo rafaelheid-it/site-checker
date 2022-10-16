@@ -25,6 +25,11 @@ class PageProcessor
 
         $pageInfo = $this->preparePageInfoFromResponse($page, $response);
 
+        $contentType = $response->getHeader('Content-Type');
+        if (!str_contains($contentType[0], 'html')) {
+            return $pageInfo;
+        }
+
         $pageDocument = new \DOMDocument();
         @$pageDocument->loadHTML($response->getBody()->getContents());
 
@@ -52,11 +57,26 @@ class PageProcessor
     protected function findLinksInPage(\DOMDocument $page): array
     {
         $linkUrls = [];
-        $linkElements = $page->getElementsByTagName('a');
+        $anchorElements = $page->getElementsByTagName('a');
 
-        /** @var \DOMNode $linkElement */
-        foreach ($linkElements as $linkElement) {
-            $linkUrls[] = $linkElement->attributes->getNamedItem('href')->nodeValue;
+        /** @var \DOMNode $anchorElement */
+        foreach ($anchorElements as $anchorElement) {
+            $linkUrls[] = $anchorElement->attributes->getNamedItem('href')->nodeValue;
+        }
+
+        /** @todo Configure if script urls should be processed */
+        if (true) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'script', 'src'));
+        }
+
+        /** @todo Configure if image urls should be processed */
+        if (true) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'img', 'src'));
+        }
+
+        /** @todo Configure if link urls should be processed */
+        if (true) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'link', 'href'));
         }
 
         return $linkUrls;
@@ -84,6 +104,22 @@ class PageProcessor
         $pageInfo->setStatusMessage($response->getReasonPhrase());
 
         return $pageInfo;
+    }
+
+    protected function findElementUrlsByTagAndAttribute(\DOMDocument &$page, string $tag, string $attribute)
+    {
+        $elementUrls = [];
+        $linkElements = $page->getElementsByTagName($tag);
+
+        /** @var \DOMNode $linkElement */
+        foreach ($linkElements as $linkElement) {
+            $src = $linkElement->attributes->getNamedItem($attribute);
+            if ($src) {
+                $elementUrls[] = $src->nodeValue;
+            }
+        }
+
+        return $elementUrls;
     }
 
 }
