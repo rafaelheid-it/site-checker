@@ -19,11 +19,14 @@ class SiteProcessor
 
     protected PageProcessor $pageProcessor;
 
+    protected ProcessingConfiguration $configuration;
+
     protected Uri $startPage;
 
     public function __construct()
     {
-        $this->pageProcessor = new PageProcessor();
+        $this->configuration = new ProcessingConfiguration();
+        $this->pageProcessor = new PageProcessor($this->configuration);
     }
 
     public function processSite(string $siteStartUrl)

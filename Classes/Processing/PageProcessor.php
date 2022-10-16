@@ -11,6 +11,13 @@ use Psr\Http\Message\ResponseInterface;
 
 class PageProcessor
 {
+    protected ProcessingConfiguration $configuration;
+
+    public function __construct(ProcessingConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
     public function processInternalPage(string $page): PageInfo
     {
         $client = new Client();
@@ -64,19 +71,28 @@ class PageProcessor
             $linkUrls[] = $anchorElement->attributes->getNamedItem('href')->nodeValue;
         }
 
-        /** @todo Configure if script urls should be processed */
-        if (true) {
+        if ($this->configuration->isShouldProcessScript()) {
             $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'script', 'src'));
         }
 
-        /** @todo Configure if image urls should be processed */
-        if (true) {
+        if ($this->configuration->isShouldProcessImg()) {
             $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'img', 'src'));
         }
 
-        /** @todo Configure if link urls should be processed */
-        if (true) {
+        if ($this->configuration->isShouldProcessLink()) {
             $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'link', 'href'));
+        }
+
+        if ($this->configuration->isShouldProcessIframe()) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'iframe', 'src'));
+        }
+
+        if ($this->configuration->isShouldProcessPicture()) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'source', 'srcset'));
+        }
+
+        if ($this->configuration->isShouldProcessAudioAndVideo()) {
+            $linkUrls = array_merge($linkUrls, $this->findElementUrlsByTagAndAttribute($page, 'source', 'src'));
         }
 
         return $linkUrls;
