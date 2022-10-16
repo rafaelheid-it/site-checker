@@ -7,6 +7,7 @@ namespace Heidtech\SiteChecker\Processing;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Heidtech\SiteChecker\Logging\PageInfo;
+use Psr\Http\Message\ResponseInterface;
 
 class PageProcessor
 {
@@ -17,21 +18,12 @@ class PageProcessor
         try {
             $response = $client->request('GET', $page);
         } catch (GuzzleException $exception) {
-            // @todo refactor (same code as in processExternalPage)
-            $statusCode = $exception->getCode();
-            $pageInfo = new PageInfo();
-            $pageInfo->setUrl($page);
-            $pageInfo->setStatusCode($statusCode);
-            $pageInfo->setErrorMessage($exception->getMessage());
-            return $pageInfo;
+            return $this->generatePageInfoFromException($page, $exception);
         }
 
         $statusCode = $response->getStatusCode();
 
-        $pageInfo = new PageInfo();
-        $pageInfo->setUrl($page);
-        $pageInfo->setStatusCode($statusCode);
-        $pageInfo->setErrorMessage($response->getReasonPhrase());
+        $pageInfo = $this->preparePageInfoFromResponse($page, $response);
 
         $pageDocument = new \DOMDocument();
         @$pageDocument->loadHTML($response->getBody()->getContents());
@@ -40,7 +32,6 @@ class PageProcessor
             $linksInPage = $this->findLinksInPage($pageDocument);
             $pageInfo->setLinksInPage($linksInPage);
         }
-
 
         return $pageInfo;
     }
@@ -52,22 +43,10 @@ class PageProcessor
         try {
             $response = $client->request('GET', $page);
         } catch (GuzzleException $exception) {
-            $statusCode = $exception->getCode();
-            $pageInfo = new PageInfo();
-            $pageInfo->setUrl($page);
-            $pageInfo->setStatusCode($statusCode);
-            $pageInfo->setErrorMessage($exception->getMessage());
-            return $pageInfo;
+            return $this->generatePageInfoFromException($page, $exception);
         }
 
-        $statusCode = $response->getStatusCode();
-
-        $pageInfo = new PageInfo();
-        $pageInfo->setUrl($page);
-        $pageInfo->setStatusCode($statusCode);
-        $pageInfo->setErrorMessage($response->getReasonPhrase());
-
-        return $pageInfo;
+        return $this->preparePageInfoFromResponse($page, $response);
     }
 
     protected function findLinksInPage(\DOMDocument $page): array
@@ -83,5 +62,28 @@ class PageProcessor
         return $linkUrls;
     }
 
+    protected function generatePageInfoFromException(string $page, GuzzleException $exception): PageInfo
+    {
+        $statusCode = $exception->getCode();
+
+        $pageInfo = new PageInfo();
+        $pageInfo->setUrl($page);
+        $pageInfo->setStatusCode($statusCode);
+        $pageInfo->setErrorMessage($exception->getMessage());
+
+        return $pageInfo;
+    }
+
+    protected function preparePageInfoFromResponse(string $page, ResponseInterface $response): PageInfo
+    {
+        $statusCode = $response->getStatusCode();
+
+        $pageInfo = new PageInfo();
+        $pageInfo->setUrl($page);
+        $pageInfo->setStatusCode($statusCode);
+        $pageInfo->setErrorMessage($response->getReasonPhrase());
+
+        return $pageInfo;
+    }
 
 }
